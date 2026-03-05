@@ -116,18 +116,20 @@ def getData():
 
         # saleNum
         sale = item.select_one(".saleNum")
-        saleNum = int(sale.get_text(strip=True).replace("판매지수 ", "").replace(",", ""))
+        if sale:
+           saleNum = int(sale.get_text(strip=True).replace("판매지수 ", "").replace(",", ""))
 
         # reviews
         review = item.select_one(".txC_blue")
-        reviews = int(review.get_text(strip=True).replace(",", ""))
+        if review:
+          reviews = int(review.get_text(strip=True).replace(",", ""))
 
         # star
         star_span = item.select_one("span.rating_grade")
         if star_span:
           star = star_span.select_one("em.yes_b").get_text(strip=True)
         
-        books.append({ "category": selected1, "weekNo" : st.session_state.week_index, "rank": i, "title": title, "author": author, "star": star, "saleNum": saleNum, "reviews": reviews })
+        books.append({ "category": selected1, "weekNo" : st.session_state.week_index, "rank": i, "title": title, "author": author, "star": float(star), "saleNum": saleNum, "reviews": reviews })
       
       # db에 저장
       st.text("데이터 수집 완료!")
