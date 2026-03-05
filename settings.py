@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
   mariadb_user: str = "root"
   mariadb_password: str = "1234"
-  mariadb_host: str = "192.168.0.204"
+  mariadb_host: str = "127.0.0.1"
   mariadb_database: str = "edu"
   mariadb_port: int = "3306"
 
