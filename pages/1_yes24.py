@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 import json
 import time
-from mariadb_crud import save, saveMany
+from mariadb_crud import save, saveMany, findAll
 
 st.set_page_config(
   page_title="yes24 수집",
@@ -170,12 +170,30 @@ def getData():
     return print(e)
   return 1
 
+def makeChart():
+   sql = "SELECT * FROM books"
+   data = findAll(sql)
+   if data:
+    df = pd.DataFrame(data)
+    # 데이터 타입 변환 (DB에서 가져온 값은 문자열일 수 있으므로 숫자로 변환)
+    df['star'] = pd.to_numeric(df['star'])
+    # 카테고리별 평균 계산
+    avg_df = df.groupby('category')[['star']].mean()
+    st.subheader("📊 국내 도서 / 해외 도서 평균 별점")
+    st.bar_chart(avg_df)
+   else:
+     st.warning("조회된 데이터가 없습니다.")
+      
+
 if st.button(f"수집하기"):
     getData()  
     # st.session_state.weekNo_index = selected2
   # elif selected1 :
   #   st.session_state.category_index = selected1
   #   # st.session_state.weekNo_index = 1157
+
+if st.button("차트그리기"):
+   makeChart()
 
 
 	
