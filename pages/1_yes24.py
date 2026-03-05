@@ -3,6 +3,7 @@ from requests import get
 import pandas as pd
 import streamlit as st
 import json
+import time
 
 st.set_page_config(
   page_title="yes24 수집",
@@ -10,8 +11,31 @@ st.set_page_config(
   layout="wide",
 )
 
+def getWeekNo():
+  try:
+    weekNos = []
+    weeks = []
+    url = "https://www.yes24.com/product/category/weekbestseller?categoryNumber=001&pageNumber=1&pageSize=24&type=week"
+    res = get(url)
+    if res.status_code == 200:
+      soup = bs(res.text, "html.parser")
+      data = soup.select('select#scope_week option')
+      for i in data:
+        weekNo = i.get('value')
+        week = i.get_text(strip=True)
+        weekNos.append(weekNo)
+        weeks.append(week)
+      #  weekNo = data.select('option')
+    return (weekNos, weeks)
+  except Exception as e:
+    return 0
+
+
 if 'category_index' not in st.session_state:
 	st.session_state.category_index = ''
+
+if 'week_index' not in st.session_state:
+	st.session_state.week_index = ''
 
 # Yes24 베스트셀러 URL 예시
 yes24 = "https://www.yes24.com/product/category/weekbestseller"
@@ -20,14 +44,14 @@ pageNumber = 1
 pageSize = 40
 type = "week"
 saleYear = 2026
-weekNo = 1149
+weekNo = st.session_state.week_index
 sex = "A"
 viewMode = "list"
 
 category_info = ["001","002"]
 category_options = ["국내 도서","국외 도서"]
-# weekNo_options = [1149,1150,1151,1152,1153,1154,1155,1156,1157]
-# weekNo_options2 = [1149,1150,1151,1152,1153,1154,1155,1156,1157]
+weekNos = getWeekNo()[0]
+weeks = getWeekNo()[1]
 
 
     
@@ -39,10 +63,15 @@ selected1 = st.selectbox(label="카테고리",
 	index=None,
 	placeholder="수집 대상을 선택하세요.")
 
-# selected2 = st.selectbox(label="날짜", 
-# 	options=weekNo_options,
-# 	index=None,
-# 	placeholder="수집 대상을 선택하세요.")
+selected2 = st.selectbox(label="날짜", 
+	options=weeks,
+	index=None,
+	placeholder="수집 대상을 선택하세요.")
+
+
+if selected1 and selected2 :
+  st.session_state.category_index = category_info[category_options.index(selected1)]
+  st.session_state.week_index = weekNos[weeks.index(selected2)]
 
 # 데이터 수집
 def getData():
@@ -106,9 +135,6 @@ if st.button(f"수집하기"):
   # elif selected1 :
   #   st.session_state.category_index = selected1
   #   # st.session_state.weekNo_index = 1157
-
-if selected1 :
-  st.session_state.category_index = category_info[category_options.index(selected1)]
 
 
 	
