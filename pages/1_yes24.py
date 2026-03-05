@@ -22,7 +22,7 @@ type = "week"
 saleYear = 2026
 weekNo = 1149
 sex = "A"
-viewMode = "thumb"
+viewMode = "list"
 
 category_info = ["001","002"]
 category_options = ["국내 도서","국외 도서"]
@@ -66,14 +66,24 @@ def getData():
       soup = bs(res.text, "html.parser")
       trs = soup.select("#yesBestList .itemUnit")
       for item in trs:
+        # 초기화
+        title = "제목 없음"
+        author = "작가 미상"
+        star = "없음"
+
+        # title
         title = item.select_one(".gd_name").get_text(strip=True)
-        print(1)
+
+        # author
         author_span = item.select_one("span.authPub.info_auth")
-        author = author_span.select_one("a").get_text(strip=True)
-        # star_span = item.select_one("span.rating_grade")
-        star_span = "0"
-        # star = star_span.select_one("em.yes_b").get_text(strip=True)
-        star = "0"
+        author_test = author_span.select_one("a")
+        author = author_test.get_text(strip=True) if author_test else author_span.get_text(strip=True)
+
+        # star
+        star_span = item.select_one("span.rating_grade")
+        if star_span:
+          star = star_span.select_one("em.yes_b").get_text(strip=True)
+        
         books.append({ "title": title, "author": author, "star": star })
       tab1, tab2, tab3 = st.tabs(["HTML 데이터", "JSON 데이터", "DataFrame"])
       with tab1:
