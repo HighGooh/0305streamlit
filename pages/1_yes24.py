@@ -3,6 +3,7 @@ from requests import get
 import pandas as pd
 import streamlit as st
 import json
+from mariadb_crud import save, saveMany
 
 st.set_page_config(
   page_title="yes24 수집",
@@ -65,7 +66,7 @@ def getData():
       books = [] # { 도서명, 저자, 별점 }
       soup = bs(res.text, "html.parser")
       trs = soup.select("#yesBestList .itemUnit")
-      for item in trs:
+      for i, item in enumerate(trs, start=1):
         # 초기화
         title = "제목 없음"
         author = "작가 미상"
@@ -84,7 +85,32 @@ def getData():
         if star_span:
           star = star_span.select_one("em.yes_b").get_text(strip=True)
         
-        books.append({ "title": title, "author": author, "star": star })
+        books.append({ "category": "국내도서", "weekNo" : 1149, "rank": i, "title": title, "author": author, "star": star, "saleNum": 100000, "reviews": 50 })
+      
+      # db에 저장
+      st.text("데이터 수집 완료!")
+      sql1 = f"""
+            select 1
+            """
+      sql2 = f"""
+          INSERT INTO edu.`books` 
+          (`category`, `weekNo`, `rank`, `title`, `author`, `star`, `saleNum`, `reviews`)
+          VALUES
+          (%s, %s, %s, %s, %s, %s, %s, %s)
+          ON DUPLICATE KEY UPDATE
+              category=VALUES(category),
+              weekNo=VALUES(weekNo),
+              rank=VALUES(rank),
+              title=VALUES(title),
+              author=VALUES(author),
+              star=VALUES(star),
+              saleNum=VALUES(saleNum),
+              reviews=VALUES(reviews)
+          """
+      values = [(row["category"], row["weekNo"], row["rank"], row["title"], row["author"], row["star"], row["saleNum"], row["reviews"]) for row in books]
+      saveMany(sql1, sql2, values)
+      st.text("데이터 저장 완료!")
+
       tab1, tab2, tab3 = st.tabs(["HTML 데이터", "JSON 데이터", "DataFrame"])
       with tab1:
         st.text("html 출력")
