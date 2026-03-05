@@ -51,8 +51,9 @@ viewMode = "list"
 
 category_info = ["001","002"]
 category_options = ["국내 도서","국외 도서"]
-weekNos = getWeekNo()[0]
-weeks = getWeekNo()[1]
+weekNum = getWeekNo()
+weekNos = weekNum[0]
+weeks = weekNum[1]
 
 
     
@@ -99,22 +100,34 @@ def getData():
         # 초기화
         title = "제목 없음"
         author = "작가 미상"
-        star = "없음"
+        star = 0
+        saleNum = 0
+        reviews = 0
 
         # title
-        title = item.select_one(".gd_name").get_text(strip=True)
+        title_span = item.select_one(".gd_name").get_text(strip=True)
+        if title_span:
+           title = title_span
 
         # author
         author_span = item.select_one("span.authPub.info_auth")
         author_test = author_span.select_one("a")
         author = author_test.get_text(strip=True) if author_test else author_span.get_text(strip=True)
 
+        # saleNum
+        sale = item.select_one(".saleNum")
+        saleNum = int(sale.get_text(strip=True).replace("판매지수 ", "").replace(",", ""))
+
+        # reviews
+        review = item.select_one(".txC_blue")
+        reviews = int(review.get_text(strip=True).replace(",", ""))
+
         # star
         star_span = item.select_one("span.rating_grade")
         if star_span:
           star = star_span.select_one("em.yes_b").get_text(strip=True)
         
-        books.append({ "category": "국내도서", "weekNo" : 1149, "rank": i, "title": title, "author": author, "star": star, "saleNum": 100000, "reviews": 50 })
+        books.append({ "category": selected1, "weekNo" : st.session_state.week_index, "rank": i, "title": title, "author": author, "star": star, "saleNum": saleNum, "reviews": reviews })
       
       # db에 저장
       st.text("데이터 수집 완료!")
@@ -152,7 +165,7 @@ def getData():
         st.text("DataFrame 출력")
         st.dataframe(pd.DataFrame(books))
   except Exception as e:
-    return 0
+    return print(e)
   return 1
 
 if st.button(f"수집하기"):
