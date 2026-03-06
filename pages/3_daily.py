@@ -47,14 +47,14 @@ st.session_state.category2_index = 0
 
 
 # 공연 카테고리를 골랐을 때 세부 카테고리가 생성
-if selected1_category == "공연":
-   selected2_category = st.selectbox(label="공연 세부 카테고리", 
-    options=category2_options,
-    index=None,
-    placeholder="수집 대상을 선택하세요.")
-   if selected2_category :
-    st.session_state.category2_index = Path2_option[category2_options.index(selected2_category)]
-   else: st.session_state.category2_index = 0
+  
+selected2_category = st.selectbox(label="공연 세부 카테고리", 
+options=category2_options,
+index=None,
+placeholder="수집 대상을 선택하세요.")
+if selected2_category :
+  st.session_state.category2_index = Path2_option[category2_options.index(selected2_category)]
+else: st.session_state.category2_index = 0
 
       
 url = (
@@ -73,7 +73,6 @@ def getData():
       st.text("API 데이터 수집 시작!")
       json_data = json.loads(res.text)
       rankingList = json_data.get("data", {}).get("rankingList", [])
-      
       if st.session_state.category2_index != '0' :
         sql1 = f"""
               select 1
@@ -118,7 +117,7 @@ def getData():
 
 def makeChart():
   try:
-    if st.session_state.category2_index == '0' :
+    if Path1_option.index(st.session_state.category1_index) == 0 and st.session_state.category2_index == '0' :
       st.text(f"URL: {url}")
       res = get(url)
       if res.status_code == 200:
@@ -183,21 +182,22 @@ with btn_col1:
         if selected1_category:
             # 버튼을 눌렀을 때 실행할 로직을 세션 상태에 저장하거나 직접 실행
             # 하지만 여기서 바로 st.write를 하면 컬럼 안에 갇히게 됩니다.
-            st.session_state.run_type = "collect"
-            if selected2_category == None :
-                st.session_state.category2_index = '0'
+          st.session_state.run_type = "collect"
         else:
-            st.warning("메뉴를 선택해주세요")
+          st.warning("메뉴를 선택해주세요")
+        if selected2_category == None :
+          st.session_state.category2_index = '0'
 
 # 차트 버튼 클릭 처리
 with btn_col2:
     if st.button("차트그리기"):
         if selected1_category:
           st.session_state.run_type = "chart"
-          if selected2_category == None :
-                st.session_state.category2_index = '0'
         else:
-            st.warning("메뉴를 선택해주세요")
+          st.warning("메뉴를 선택해주세요")
+        print(selected2_category)
+        if selected2_category == None :
+          st.session_state.category2_index = '0'
 
 with btn_col3:
     if st.button("수집 초기화"):
