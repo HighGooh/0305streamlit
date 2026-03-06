@@ -238,7 +238,7 @@ def makeChart():
     st.info("해당 주차 및 카테고리에 검색된 데이터가 없습니다.")
 
 # 1. 버튼 레이아웃 (세 번째 spacer 컬럼으로 버튼을 왼쪽으로 밀착)
-btn_col1, btn_col2, spacer = st.columns([1, 1, 14])
+btn_col1, btn_col2 = st.columns([1, 1])
 
 # 수집 버튼 클릭 처리
 with btn_col1:
