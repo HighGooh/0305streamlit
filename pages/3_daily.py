@@ -10,7 +10,81 @@ st.set_page_config(
   layout="wide",
 )
 
-url = "https://mapi.ticketlink.co.kr/mapi/ranking/genre/daily?categoryId=10&categoryId2=16&categoryId3=0&menu=RANKING"
+if 'category_index' not in st.session_state:
+	st.session_state.category_index = ''
+
+
+Path1_option = ["10","20","30","40","50"]
+Path2_option = ["0","14","15","16","17","18","19","20","21"]
+Path3_option = ["0","21","22","23","24","25"]
+
+
+category1_options = ["공연","스포츠","전시/행사","레저","영화(특별상영 등)"]
+category2_options = ["전체","콘서트","연극","뮤지컬","클래식/무용","아동/가족","복합장르","국악","오페라"]
+category3_options = ["전체","축구","야구","농구","배구","e스포츠"]
+
+
+selected1_category = st.selectbox(label="카테고리", 
+	options=category1_options,
+	index=None,
+	placeholder="수집 대상을 선택하세요.")
+
+# 전체 카테고리 선택
+if selected1_category :
+  st.session_state.category1_index = Path1_option[category1_options.index(selected1_category)]
+else:
+  st.session_state.category1_index = 0
+
+
+# 공연 카테고리를 골랐을 때 세부 카테고리가 생성
+if selected1_category == "공연":
+   selected2_category = st.selectbox(label="공연 세부 카테고리", 
+    options=category2_options,
+    index=None,
+    placeholder="수집 대상을 선택하세요.")
+   if selected2_category :
+    st.session_state.category2_index = Path2_option[category2_options.index(selected2_category)]
+# 세부 카테고리를 골랐을 때 url 생성    
+    url = (
+    f"https://mapi.ticketlink.co.kr/mapi/ranking/genre/daily?"
+    f"categoryId={st.session_state.category1_index}"
+    f"&categoryId2={st.session_state.category2_index}"
+    f"&categoryId3=0"
+    f"&menu=RANKING"
+    )
+# 세부 카테고리를 선택하지 않으면 선택한 카테고리 전체의 url 생성
+   else: url = (
+    f"https://mapi.ticketlink.co.kr/mapi/ranking/genre/daily?"
+    f"categoryId={st.session_state.category1_index}"
+    f"&categoryId2=0"
+    f"&categoryId3=0"
+    f"&menu=RANKING"
+    )
+
+# 스포츠 카테고리를 골랐을 때 세부 카테고리가 생성
+if selected1_category == "스포츠":
+  selected3_category = st.selectbox(label="스포츠 세부 카테고리", 
+    options=category3_options,
+    index=None,
+    placeholder="수집 대상을 선택하세요.")
+  if selected3_category :
+    st.session_state.category3_index = Path3_option[category3_options.index(selected3_category)]
+# 세부 카테고리를 골랐을 때 url 생성
+    url = (
+    f"https://mapi.ticketlink.co.kr/mapi/ranking/genre/daily?"
+    f"categoryId={st.session_state.category1_index}"
+    f"&categoryId2={st.session_state.category3_index}"
+    f"&categoryId3=0"
+    f"&menu=RANKING"
+    )
+# 세부 카테고리를 선택하지 않으면 선택한 카테고리 전체의 url 생성
+  else: url = (
+    f"https://mapi.ticketlink.co.kr/mapi/ranking/genre/daily?"
+    f"categoryId={st.session_state.category1_index}"
+    f"&categoryId2=0"
+    f"&categoryId3=0"
+    f"&menu=RANKING"
+    )
 
 # 데이터 수집
 def getData():
