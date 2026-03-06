@@ -32,29 +32,9 @@ with st.expander("보기"):
       return 1
   """)
 
-st.subheader("2. 인터파크 티켓 수집")
+st.subheader("2. yes24 차트그리기")
 with st.expander("보기"):
-  st.page_link(page="./pages/2_interpark.py", label="[수집 보기]", icon="🔗")
-  st.code("""
-    def getData():
-      try:
-        url = ""
-        st.text(f"URL: {url}")
-        res = get(url)
-        if res.status_code == 200:
-          st.text("인터파크 티켓 수집 시작!")
-          tickets = [] # { 장르, 티켓이름, 장소, 시작날짜, 종료날짜, 예매율 }
-          tab1, tab2, tab3 = st.tabs(["HTML 데이터", "JSON 데이터", "DataFrame"])
-          with tab1:
-            st.text("html 출력")
-          with tab2:
-            st.text("JSON 출력")
-          with tab3:
-            st.text("DataFrame 출력")
-      except Exception as e:
-        return 0
-      return 1
-  """)
+  st.page_link(page="./pages/2_yes24chart.py", label="[차트 보기]", icon="🔗")
 
 st.subheader("3. 일간(‘daily’) 랭킹 수집")
 with st.expander("보기"):
