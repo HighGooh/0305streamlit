@@ -60,7 +60,9 @@ weeks = weekNum[1]
     
 # if 'weekNo_index' not in st.session_state:
 # 	st.session_state.weekNo_index = ''
-   
+
+st.title("Yes24 주간 베스트셀러 수집")
+
 selected1 = st.selectbox(label="카테고리", 
 	options=category_options,
 	index=None,
@@ -197,11 +199,11 @@ def makeChart():
             y="saleNum",
             text="title",
             title="TOP 10 도서 판매량 현황",
-            labels={"rank": "순위", "saleNum": "판매량"},
+            labels={"title": "제목", "rank": "순위", "saleNum": "판매량"},
             color="saleNum",
             color_continuous_scale="Blues"
         )
-        st.plotly_chart(fig_bar, use_container_width=True)
+        st.plotly_chart(fig_bar, width='stretch')
 
     with col2:
         # 차트 2: 리뷰 대비 별점 분포 (버블 차트)
@@ -214,9 +216,9 @@ def makeChart():
             color="title",
             hover_name="title",
             title="리뷰 수 vs 별점 (원 크기=판매량)",
-            labels={"reviews": "리뷰 수", "star": "별점"}
+            labels={"title": "제목", "reviews": "리뷰 수", "star": "별점", "saleNum": "판매부수"}
         )
-        st.plotly_chart(fig_bubble, use_container_width=True)
+        st.plotly_chart(fig_bubble, width='stretch')
 
     # --- 하단 상세 데이터 ---
     st.divider()
@@ -224,7 +226,7 @@ def makeChart():
     st.dataframe(
         df[["rank", "title", "author", "saleNum", "star", "reviews"]].sort_values("rank"),
         hide_index=True,
-        use_container_width=True,
+        width='stretch',
         column_config = {
           "rank": "순위",
           "title": "도서명",
@@ -236,6 +238,7 @@ def makeChart():
     )
   else:
     st.info("해당 주차 및 카테고리에 검색된 데이터가 없습니다.")
+
 
 # 1. 버튼 레이아웃 (세 번째 spacer 컬럼으로 버튼을 왼쪽으로 밀착)
 btn_col1, btn_col2 = st.columns([1, 1])
