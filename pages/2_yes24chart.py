@@ -3,6 +3,8 @@ import pandas as pd
 from mariadb_crud import findAll
 import plotly.graph_objects as go
 import numpy as np
+from requests import get
+from bs4 import BeautifulSoup as bs
 
 st.set_page_config(
     page_title="yes24 차트",
@@ -10,11 +12,21 @@ st.set_page_config(
     layout="wide",
 )
 
+week_date_map = {
+    1157: "1157주 (02.23~03.01)",
+    1156: "1156주 (02.16~02.22)",
+    1155: "1155주 (02.09~02.15)",
+    1154: "1154주 (02.02~02.08)",
+    1153: "1153주 (01.26~02.01)",
+    1152: "1152주 (01.19~01.25)",
+    1151: "1151주 (01.12~01.18)",
+    1150: "1150주 (01.05~01.11)",
+    1149: "1149주 (12.29~01.04)"
+}
+
 st.title("Yes24 주간 베스트셀러 차트")
 
-# 1. 데이터 로드 및 전처리
-
-
+# 데이터 로드 및 전처리
 @st.cache_data
 def load_trend_data():
     # 모든 데이터를 가져와서 분석용으로 가공
@@ -66,7 +78,8 @@ if not df_trend.empty:
     start_wk, end_wk = st.select_slider(
         '📅 조회 주차 범위 선택',
         options=weeks,
-        value=(min(weeks), max(weeks))
+        value=(min(weeks), max(weeks)),
+        format_func=lambda x: week_date_map.get(x, f"{x}주")
     )
 
     # 필터링 및 차트 생성
@@ -87,13 +100,18 @@ if not df_trend.empty:
             marker=dict(size=10)
         ))
 
+    # 차트 레이아웃 설정
     fig.update_layout(
         title=f"📊 {start_wk}주 ~ {end_wk}주 {y_option} 추이",
         xaxis_title="주차",
         yaxis_title=y_option,
         hovermode="x unified",
         height=500,
-        xaxis=dict(tickmode='linear', dtick=1),
+        xaxis=dict(
+                    tickmode='array',
+                    tickvals=weeks,
+                    ticktext=[week_date_map.get(w, str(w)) for w in weeks]
+                   ),
         margin=dict(t=50, b=50),
         showlegend=True,
         legend=dict(orientation="h", y=-0.2, xanchor="center",x=0.5),
